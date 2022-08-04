@@ -1,10 +1,12 @@
-import ReactDOM from "react-dom";
-import React from "react";
+import ReactDOM from 'react-dom';
+import React from 'react';
 import CmsSite from './Components/CmsSite';
 import EpiContext from './Spa';
-import ComponentPreLoader from "./Loaders/ComponentPreLoader";
+import { CacheProvider } from '@emotion/react';
+import ComponentPreLoader from './Loaders/ComponentPreLoader';
 import DefaultServiceContainer from './Core/DefaultServiceContainer';
-import { StylesProvider, createGenerateClassName, } from "@material-ui/core/styles";
+import createCache from '@emotion/cache';
+import { setBaseClassName } from './Util/StylingUtils';
 export function InitBrowser(config, containerId, serviceContainer) {
     try {
         if ((__INITIAL_DATA__ === null || __INITIAL_DATA__ === void 0 ? void 0 : __INITIAL_DATA__.status) === 'loading') {
@@ -18,12 +20,8 @@ export function InitBrowser(config, containerId, serviceContainer) {
     return _doInitBrowser(config, containerId, serviceContainer);
 }
 function _doInitBrowser(config, containerId, serviceContainer) {
-    const generateClassName = createGenerateClassName({
-        productionPrefix: "MO"
-        //disableGlobal: true
-    });
     EpiContext.init(config, serviceContainer || new DefaultServiceContainer());
-    const container = document.getElementById(containerId ? containerId : "epi-page-container");
+    const container = document.getElementById(containerId ? containerId : 'epi-page-container');
     if (container && container.childElementCount > 0) {
         const components = EpiContext.config().preLoadComponents || [];
         if (EpiContext.isDebugActive())
@@ -32,7 +30,9 @@ function _doInitBrowser(config, containerId, serviceContainer) {
         ComponentPreLoader.load(components, loader).finally(() => {
             if (EpiContext.isDebugActive())
                 console.info('Hydrating existing render, Stage 2. Hydration ...');
-            ReactDOM.hydrate(React.createElement(StylesProvider, { generateClassName: generateClassName },
+            setBaseClassName('MO');
+            const cache = createCache({ key: 'css' });
+            ReactDOM.hydrate(React.createElement(CacheProvider, { value: cache },
                 React.createElement(CmsSite, { context: EpiContext })), container);
         });
     }
