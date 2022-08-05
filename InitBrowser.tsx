@@ -9,7 +9,6 @@ import IServiceContainer from './Core/IServiceContainer';
 import DefaultServiceContainer from './Core/DefaultServiceContainer';
 import ServerContextType from './ServerSideRendering/ServerContext';
 
-import createCache from '@emotion/cache';
 import { setBaseClassName } from './Util/StylingUtils';
 
 declare let __INITIAL_DATA__: ServerContextType;
@@ -40,14 +39,7 @@ function _doInitBrowser(config: AppConfig, containerId?: string, serviceContaine
 
       setBaseClassName('MO');
 
-      const cache = createCache({ key: 'css' });
-
-      ReactDOM.hydrate(
-        <CacheProvider value={cache}>
-          <CmsSite context={EpiContext} />
-        </CacheProvider>,
-        container,
-      );
+      ReactDOM.hydrate(<CmsSite context={EpiContext} />, container);
     });
   } else {
     if (EpiContext.isDebugActive()) console.info('Building new application');

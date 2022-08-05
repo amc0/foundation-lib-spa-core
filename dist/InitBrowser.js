@@ -2,10 +2,8 @@ import ReactDOM from 'react-dom';
 import React from 'react';
 import CmsSite from './Components/CmsSite';
 import EpiContext from './Spa';
-import { CacheProvider } from '@emotion/react';
 import ComponentPreLoader from './Loaders/ComponentPreLoader';
 import DefaultServiceContainer from './Core/DefaultServiceContainer';
-import createCache from '@emotion/cache';
 import { setBaseClassName } from './Util/StylingUtils';
 export function InitBrowser(config, containerId, serviceContainer) {
     try {
@@ -31,9 +29,7 @@ function _doInitBrowser(config, containerId, serviceContainer) {
             if (EpiContext.isDebugActive())
                 console.info('Hydrating existing render, Stage 2. Hydration ...');
             setBaseClassName('MO');
-            const cache = createCache({ key: 'css' });
-            ReactDOM.hydrate(React.createElement(CacheProvider, { value: cache },
-                React.createElement(CmsSite, { context: EpiContext })), container);
+            ReactDOM.hydrate(React.createElement(CmsSite, { context: EpiContext }), container);
         });
     }
     else {
