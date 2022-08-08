@@ -3,7 +3,6 @@ import React from 'react';
 import CmsSite from './Components/CmsSite';
 import AppConfig from './AppConfig';
 import EpiContext from './Spa';
-import { CacheProvider } from '@emotion/react';
 import ComponentPreLoader, { IComponentPreloadList } from './Loaders/ComponentPreLoader';
 import IServiceContainer from './Core/IServiceContainer';
 import DefaultServiceContainer from './Core/DefaultServiceContainer';
