@@ -39,6 +39,8 @@ export default function RenderServerSide(config: AppConfig, serviceContainer?: I
   // const emotionCache = createCache({ key: 'css' });
   // const { extractCriticalToChunks, constructStyleTagsFromChunks } = createEmotionServer(emotionCache);
 
+  throw document;
+
   setBaseClassName(classPrefix);
 
   const staticContext: StaticRouterContext = {};
