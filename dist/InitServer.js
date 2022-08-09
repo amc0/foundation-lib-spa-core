@@ -4,11 +4,13 @@ import getGlobal from './AppGlobal';
 import { renderToString } from 'react-dom/server';
 import { Helmet } from 'react-helmet';
 import React from 'react';
+import createCache from '@emotion/cache';
+import createEmotionServer from '@emotion/server/create-instance';
 import DefaultServiceContainer from './Core/DefaultServiceContainer';
 import EpiSpaContext from './Spa';
 import CmsSite from './Components/CmsSite';
 import { setBaseClassName } from './Util/StylingUtils';
-import { extractCritical } from '@emotion/server';
+import { CacheProvider } from '@emotion/react';
 export default function RenderServerSide(config, serviceContainer) {
     // Update context
     const ctx = getGlobal();
@@ -21,27 +23,24 @@ export default function RenderServerSide(config, serviceContainer) {
     config.enableDebug = true;
     EpiSpaContext.init(config, serviceContainer, true);
     const classPrefix = 'MO';
-    // const emotionCache = createCache({ key: 'css' });
-    // const { extractCriticalToChunks, constructStyleTagsFromChunks } = createEmotionServer(emotionCache);
+    const emotionCache = createCache({ key: 'css' });
+    const { extractCriticalToChunks, constructStyleTagsFromChunks } = createEmotionServer(emotionCache);
+    // throw document;
     setBaseClassName(classPrefix);
     const staticContext = {};
-    // const body = ReactDOMServer.renderToString(
-    //   <CacheProvider value={emotionCache}>
-    //     <CmsSite context={EpiSpaContext} staticContext={staticContext} />
-    //   </CacheProvider>,
-    // );
-    const { html, ids, css } = extractCritical(renderToString(React.createElement(CmsSite, { context: EpiSpaContext, staticContext: staticContext })));
-    // const emotionChunks = extractCriticalToChunks(body);
-    // const emotionCss = constructStyleTagsFromChunks(emotionChunks);
+    const body = renderToString(React.createElement(CacheProvider, { value: emotionCache },
+        React.createElement(CmsSite, { context: EpiSpaContext, staticContext: staticContext })));
+    const emotionChunks = extractCriticalToChunks(body);
+    const emotionCss = constructStyleTagsFromChunks(emotionChunks);
     const meta = Helmet.renderStatic();
     return {
-        Body: html,
+        Body: body.toString(),
         HtmlAttributes: meta.htmlAttributes.toString(),
         Title: meta.title.toString(),
         Meta: meta.meta.toString(),
         Link: meta.link.toString(),
         Script: meta.script.toString(),
-        Style: css,
+        Style: emotionCss,
         BodyAttributes: meta.bodyAttributes.toString(),
     };
 }
