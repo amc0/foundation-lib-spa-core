@@ -33,14 +33,12 @@ export default function RenderServerSide(config: AppConfig, serviceContainer?: I
   config.noAjax = true;
   config.enableDebug = true;
   EpiSpaContext.init(config, serviceContainer, true);
-  const classPrefix = 'MO';
+  //const classPrefix = 'MO';
 
   const emotionCache = createCache({ key: 'css' });
   const { extractCriticalToChunks, constructStyleTagsFromChunks } = createEmotionServer(emotionCache);
 
-  // throw document;
-
-  setBaseClassName(classPrefix);
+  //setBaseClassName(classPrefix);
 
   const staticContext: StaticRouterContext = {};
 
