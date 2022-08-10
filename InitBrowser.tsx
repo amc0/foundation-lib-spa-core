@@ -9,6 +9,8 @@ import DefaultServiceContainer from './Core/DefaultServiceContainer';
 import ServerContextType from './ServerSideRendering/ServerContext';
 
 import { setBaseClassName } from './Util/StylingUtils';
+import createCache from '@emotion/cache';
+import { CacheProvider } from '@emotion/react';
 
 declare let __INITIAL_DATA__: ServerContextType;
 
@@ -27,6 +29,14 @@ export function InitBrowser(config: AppConfig, containerId?: string, serviceCont
 function _doInitBrowser(config: AppConfig, containerId?: string, serviceContainer?: IServiceContainer): void {
   EpiContext.init(config, serviceContainer || new DefaultServiceContainer());
 
+  const emotionCache = createCache({ key: 'css' });
+
+  const app = (
+    <CacheProvider value={emotionCache}>
+      <CmsSite context={EpiContext} />
+    </CacheProvider>
+  );
+
   const container = document.getElementById(containerId ? containerId : 'epi-page-container');
   if (container && container.childElementCount > 0) {
     const components: IComponentPreloadList = EpiContext.config().preLoadComponents || [];
@@ -38,11 +48,11 @@ function _doInitBrowser(config: AppConfig, containerId?: string, serviceContaine
 
       setBaseClassName('MO');
 
-      ReactDOM.hydrate(<CmsSite context={EpiContext} />, container);
+      ReactDOM.hydrate(app, container);
     });
   } else {
     if (EpiContext.isDebugActive()) console.info('Building new application');
-    ReactDOM.render(<CmsSite context={EpiContext} />, container);
+    ReactDOM.render(app, container);
   }
 }
 
