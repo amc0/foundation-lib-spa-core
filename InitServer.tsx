@@ -18,7 +18,7 @@ import AppConfig from './AppConfig';
 
 // Episerver SPA/PWA Server Side Rendering libs
 import SSRResponse from './ServerSideRendering/Response';
-import { setBaseClassName } from './Util/StylingUtils';
+import { createMuiCache, setBaseClassName } from './Util/StylingUtils';
 import { CacheProvider } from '@emotion/react';
 import { getTssDefaultEmotionCache } from 'tss-react';
 
@@ -35,24 +35,17 @@ export default function RenderServerSide(config: AppConfig, serviceContainer?: I
   config.enableDebug = true;
   EpiSpaContext.init(config, serviceContainer, true);
 
-  //const emotionCache = createCache({ key: 'css', prepend: true });
+  const muiCache = createMuiCache();
 
-  const emotionServers = [
-    // Every emotion cache used in the app should be provided.
-    // Caches for MUI should use "prepend": true.
-    // MUI cache should come first.
-    //emotionCache,
-    getTssDefaultEmotionCache({ doReset: true }),
-  ].map(createEmotionServer);
+  const emotionServers = [muiCache, getTssDefaultEmotionCache({ doReset: true })].map(createEmotionServer);
 
   setBaseClassName('MO');
 
-  const emotionCache = getTssDefaultEmotionCache({ doReset: true });
-  const { extractCriticalToChunks, constructStyleTagsFromChunks } = createEmotionServer(emotionCache);
+  //const emotionCache = getTssDefaultEmotionCache({doReset: true})
   const staticContext: StaticRouterContext = {};
 
   const body = renderToString(
-    <CacheProvider value={emotionCache}>
+    <CacheProvider value={muiCache}>
       <CmsSite context={EpiSpaContext} staticContext={staticContext} />
     </CacheProvider>,
   );
@@ -63,9 +56,6 @@ export default function RenderServerSide(config: AppConfig, serviceContainer?: I
     )
     .join('');
 
-  const emotionChunks = extractCriticalToChunks(body);
-  const emotionCss = constructStyleTagsFromChunks(emotionChunks);
-
   const meta = Helmet.renderStatic();
 
   return {
@@ -75,7 +65,7 @@ export default function RenderServerSide(config: AppConfig, serviceContainer?: I
     Meta: meta.meta.toString(),
     Link: meta.link.toString(),
     Script: meta.script.toString(),
-    Style: emotionCss,
+    Style: styles,
     BodyAttributes: meta.bodyAttributes.toString(),
   };
 }

@@ -8,7 +8,7 @@ import IServiceContainer from './Core/IServiceContainer';
 import DefaultServiceContainer from './Core/DefaultServiceContainer';
 import ServerContextType from './ServerSideRendering/ServerContext';
 
-import { setBaseClassName } from './Util/StylingUtils';
+import { createMuiCache, setBaseClassName } from './Util/StylingUtils';
 import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
 import { getTssDefaultEmotionCache } from 'tss-react';
@@ -30,15 +30,13 @@ export function InitBrowser(config: AppConfig, containerId?: string, serviceCont
 function _doInitBrowser(config: AppConfig, containerId?: string, serviceContainer?: IServiceContainer): void {
   EpiContext.init(config, serviceContainer || new DefaultServiceContainer());
 
-  const emotionCache = createCache({ key: 'css', prepend: true });
+  setBaseClassName('MO');
 
   const app = (
-    <CacheProvider value={getTssDefaultEmotionCache({ doReset: true })}>
+    <CacheProvider value={createMuiCache()}>
       <CmsSite context={EpiContext} />
     </CacheProvider>
   );
-
-  setBaseClassName('MO');
 
   const container = document.getElementById(containerId ? containerId : 'epi-page-container');
   if (container && container.childElementCount > 0) {
