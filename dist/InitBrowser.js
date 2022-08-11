@@ -24,6 +24,7 @@ function _doInitBrowser(config, containerId, serviceContainer) {
     const emotionCache = createCache({ key: 'css' });
     const app = (React.createElement(CacheProvider, { value: emotionCache },
         React.createElement(CmsSite, { context: EpiContext })));
+    setBaseClassName('MO');
     const container = document.getElementById(containerId ? containerId : 'epi-page-container');
     if (container && container.childElementCount > 0) {
         const components = EpiContext.config().preLoadComponents || [];
@@ -33,7 +34,6 @@ function _doInitBrowser(config, containerId, serviceContainer) {
         ComponentPreLoader.load(components, loader).finally(() => {
             if (EpiContext.isDebugActive())
                 console.info('Hydrating existing render, Stage 2. Hydration ...');
-            setBaseClassName('MO');
             ReactDOM.hydrate(app, container);
         });
     }

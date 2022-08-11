@@ -9,6 +9,7 @@ import createEmotionServer from '@emotion/server/create-instance';
 import DefaultServiceContainer from './Core/DefaultServiceContainer';
 import EpiSpaContext from './Spa';
 import CmsSite from './Components/CmsSite';
+import { setBaseClassName } from './Util/StylingUtils';
 import { CacheProvider } from '@emotion/react';
 export default function RenderServerSide(config, serviceContainer) {
     // Update context
@@ -21,10 +22,9 @@ export default function RenderServerSide(config, serviceContainer) {
     config.noAjax = true;
     config.enableDebug = true;
     EpiSpaContext.init(config, serviceContainer, true);
-    //const classPrefix = 'MO';
     const emotionCache = createCache({ key: 'css' });
     const { extractCriticalToChunks, constructStyleTagsFromChunks } = createEmotionServer(emotionCache);
-    //setBaseClassName(classPrefix);
+    setBaseClassName('MO');
     const staticContext = {};
     const body = renderToString(React.createElement(CacheProvider, { value: emotionCache },
         React.createElement(CmsSite, { context: EpiSpaContext, staticContext: staticContext })));
