@@ -29,7 +29,7 @@ export function InitBrowser(config: AppConfig, containerId?: string, serviceCont
 function _doInitBrowser(config: AppConfig, containerId?: string, serviceContainer?: IServiceContainer): void {
   EpiContext.init(config, serviceContainer || new DefaultServiceContainer());
 
-  const emotionCache = createCache({ key: 'css' });
+  const emotionCache = createCache({ key: 'css', prepend: true });
 
   const app = (
     <CacheProvider value={emotionCache}>

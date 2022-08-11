@@ -69,6 +69,7 @@
         "@emotion/cache": "^11.10.1",
         "@emotion/react": "^11.10.0",
         "@emotion/server": "^11.10.0",
-        "@mui/material": "^5.9.3"
+        "@mui/material": "^5.9.3",
+        "tss-react": "3.7.1"
     }
 }

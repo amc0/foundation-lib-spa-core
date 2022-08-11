@@ -20,6 +20,7 @@ import AppConfig from './AppConfig';
 import SSRResponse from './ServerSideRendering/Response';
 import { setBaseClassName } from './Util/StylingUtils';
 import { CacheProvider } from '@emotion/react';
+import { getTssDefaultEmotionCache } from 'tss-react';
 
 export default function RenderServerSide(config: AppConfig, serviceContainer?: IServiceContainer): SSRResponse {
   // Update context
@@ -34,8 +35,15 @@ export default function RenderServerSide(config: AppConfig, serviceContainer?: I
   config.enableDebug = true;
   EpiSpaContext.init(config, serviceContainer, true);
 
-  const emotionCache = createCache({ key: 'css' });
-  const { extractCriticalToChunks, constructStyleTagsFromChunks } = createEmotionServer(emotionCache);
+  const emotionCache = createCache({ key: 'css', prepend: true });
+
+  const emotionServers = [
+    // Every emotion cache used in the app should be provided.
+    // Caches for MUI should use "prepend": true.
+    // MUI cache should come first.
+    emotionCache,
+    getTssDefaultEmotionCache({ doReset: true }),
+  ].map(createEmotionServer);
 
   setBaseClassName('MO');
 
@@ -47,8 +55,11 @@ export default function RenderServerSide(config: AppConfig, serviceContainer?: I
     </CacheProvider>,
   );
 
-  const emotionChunks = extractCriticalToChunks(body);
-  const emotionCss = constructStyleTagsFromChunks(emotionChunks);
+  const styles = emotionServers
+    .map(({ extractCriticalToChunks, constructStyleTagsFromChunks }) =>
+      constructStyleTagsFromChunks(extractCriticalToChunks(body)),
+    )
+    .join('');
 
   const meta = Helmet.renderStatic();
 
@@ -59,7 +70,7 @@ export default function RenderServerSide(config: AppConfig, serviceContainer?: I
     Meta: meta.meta.toString(),
     Link: meta.link.toString(),
     Script: meta.script.toString(),
-    Style: emotionCss,
+    Style: styles,
     BodyAttributes: meta.bodyAttributes.toString(),
   };
 }

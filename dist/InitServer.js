@@ -11,6 +11,7 @@ import EpiSpaContext from './Spa';
 import CmsSite from './Components/CmsSite';
 import { setBaseClassName } from './Util/StylingUtils';
 import { CacheProvider } from '@emotion/react';
+import { getTssDefaultEmotionCache } from 'tss-react';
 export default function RenderServerSide(config, serviceContainer) {
     // Update context
     const ctx = getGlobal();
@@ -22,14 +23,21 @@ export default function RenderServerSide(config, serviceContainer) {
     config.noAjax = true;
     config.enableDebug = true;
     EpiSpaContext.init(config, serviceContainer, true);
-    const emotionCache = createCache({ key: 'css' });
-    const { extractCriticalToChunks, constructStyleTagsFromChunks } = createEmotionServer(emotionCache);
+    const emotionCache = createCache({ key: 'css', prepend: true });
+    const emotionServers = [
+        // Every emotion cache used in the app should be provided.
+        // Caches for MUI should use "prepend": true.
+        // MUI cache should come first.
+        emotionCache,
+        getTssDefaultEmotionCache({ doReset: true }),
+    ].map(createEmotionServer);
     setBaseClassName('MO');
     const staticContext = {};
     const body = renderToString(React.createElement(CacheProvider, { value: emotionCache },
         React.createElement(CmsSite, { context: EpiSpaContext, staticContext: staticContext })));
-    const emotionChunks = extractCriticalToChunks(body);
-    const emotionCss = constructStyleTagsFromChunks(emotionChunks);
+    const styles = emotionServers
+        .map(({ extractCriticalToChunks, constructStyleTagsFromChunks }) => constructStyleTagsFromChunks(extractCriticalToChunks(body)))
+        .join('');
     const meta = Helmet.renderStatic();
     return {
         Body: body.toString(),
@@ -38,7 +46,7 @@ export default function RenderServerSide(config, serviceContainer) {
         Meta: meta.meta.toString(),
         Link: meta.link.toString(),
         Script: meta.script.toString(),
-        Style: emotionCss,
+        Style: styles,
         BodyAttributes: meta.bodyAttributes.toString(),
     };
 }

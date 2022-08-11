@@ -21,7 +21,7 @@ export function InitBrowser(config, containerId, serviceContainer) {
 }
 function _doInitBrowser(config, containerId, serviceContainer) {
     EpiContext.init(config, serviceContainer || new DefaultServiceContainer());
-    const emotionCache = createCache({ key: 'css' });
+    const emotionCache = createCache({ key: 'css', prepend: true });
     const app = (React.createElement(CacheProvider, { value: emotionCache },
         React.createElement(CmsSite, { context: EpiContext })));
     setBaseClassName('MO');
