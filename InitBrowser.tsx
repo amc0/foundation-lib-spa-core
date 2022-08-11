@@ -11,6 +11,7 @@ import ServerContextType from './ServerSideRendering/ServerContext';
 import { setBaseClassName } from './Util/StylingUtils';
 import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
+import { getTssDefaultEmotionCache } from 'tss-react';
 
 declare let __INITIAL_DATA__: ServerContextType;
 
@@ -32,7 +33,7 @@ function _doInitBrowser(config: AppConfig, containerId?: string, serviceContaine
   const emotionCache = createCache({ key: 'css', prepend: true });
 
   const app = (
-    <CacheProvider value={emotionCache}>
+    <CacheProvider value={getTssDefaultEmotionCache({ doReset: true })}>
       <CmsSite context={EpiContext} />
     </CacheProvider>
   );

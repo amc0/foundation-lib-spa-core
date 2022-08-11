@@ -35,18 +35,20 @@ export default function RenderServerSide(config: AppConfig, serviceContainer?: I
   config.enableDebug = true;
   EpiSpaContext.init(config, serviceContainer, true);
 
-  const emotionCache = createCache({ key: 'css', prepend: true });
+  //const emotionCache = createCache({ key: 'css', prepend: true });
 
   const emotionServers = [
     // Every emotion cache used in the app should be provided.
     // Caches for MUI should use "prepend": true.
     // MUI cache should come first.
-    emotionCache,
+    //emotionCache,
     getTssDefaultEmotionCache({ doReset: true }),
   ].map(createEmotionServer);
 
   setBaseClassName('MO');
 
+  const emotionCache = getTssDefaultEmotionCache({ doReset: true });
+  const { extractCriticalToChunks, constructStyleTagsFromChunks } = createEmotionServer(emotionCache);
   const staticContext: StaticRouterContext = {};
 
   const body = renderToString(
@@ -61,6 +63,9 @@ export default function RenderServerSide(config: AppConfig, serviceContainer?: I
     )
     .join('');
 
+  const emotionChunks = extractCriticalToChunks(body);
+  const emotionCss = constructStyleTagsFromChunks(emotionChunks);
+
   const meta = Helmet.renderStatic();
 
   return {
@@ -70,7 +75,7 @@ export default function RenderServerSide(config: AppConfig, serviceContainer?: I
     Meta: meta.meta.toString(),
     Link: meta.link.toString(),
     Script: meta.script.toString(),
-    Style: styles,
+    Style: emotionCss,
     BodyAttributes: meta.bodyAttributes.toString(),
   };
 }

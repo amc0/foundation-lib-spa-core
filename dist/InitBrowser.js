@@ -7,6 +7,7 @@ import DefaultServiceContainer from './Core/DefaultServiceContainer';
 import { setBaseClassName } from './Util/StylingUtils';
 import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
+import { getTssDefaultEmotionCache } from 'tss-react';
 export function InitBrowser(config, containerId, serviceContainer) {
     try {
         if ((__INITIAL_DATA__ === null || __INITIAL_DATA__ === void 0 ? void 0 : __INITIAL_DATA__.status) === 'loading') {
@@ -22,7 +23,7 @@ export function InitBrowser(config, containerId, serviceContainer) {
 function _doInitBrowser(config, containerId, serviceContainer) {
     EpiContext.init(config, serviceContainer || new DefaultServiceContainer());
     const emotionCache = createCache({ key: 'css', prepend: true });
-    const app = (React.createElement(CacheProvider, { value: emotionCache },
+    const app = (React.createElement(CacheProvider, { value: getTssDefaultEmotionCache({ doReset: true }) },
         React.createElement(CmsSite, { context: EpiContext })));
     setBaseClassName('MO');
     const container = document.getElementById(containerId ? containerId : 'epi-page-container');
