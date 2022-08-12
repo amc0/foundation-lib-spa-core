@@ -11,7 +11,6 @@ import EpiSpaContext from './Spa';
 import CmsSite from './Components/CmsSite';
 import { setBaseClassName } from './Util/StylingUtils';
 import { CacheProvider } from '@emotion/react';
-import { getTssDefaultEmotionCache } from 'tss-react';
 export let muiCache = undefined;
 export function createMuiCache() {
     return (muiCache = createCache({
@@ -31,14 +30,19 @@ export default function RenderServerSide(config, serviceContainer) {
     config.enableDebug = true;
     EpiSpaContext.init(config, serviceContainer, true);
     const muiCache = createMuiCache();
-    const emotionServers = [muiCache, getTssDefaultEmotionCache({ doReset: true })].map(createEmotionServer);
+    //const emotionServers = getTssDefaultEmotionCache({ doReset: true });
     setBaseClassName('MO');
+    const { extractCriticalToChunks, constructStyleTagsFromChunks } = createEmotionServer(muiCache);
     const staticContext = {};
     const body = renderToString(React.createElement(CacheProvider, { value: muiCache },
         React.createElement(CmsSite, { context: EpiSpaContext, staticContext: staticContext })));
-    const styles = emotionServers
-        .map(({ extractCriticalToChunks, constructStyleTagsFromChunks }) => constructStyleTagsFromChunks(extractCriticalToChunks(body)))
-        .join('');
+    const emotionChunks = extractCriticalToChunks(body);
+    const emotionCss = constructStyleTagsFromChunks(emotionChunks);
+    // const styles = emotionServers
+    //   .map(({ extractCriticalToChunks, constructStyleTagsFromChunks }) =>
+    //     constructStyleTagsFromChunks(extractCriticalToChunks(body)),
+    //   )
+    //   .join('');
     const meta = Helmet.renderStatic();
     return {
         Body: body.toString(),
@@ -47,7 +51,7 @@ export default function RenderServerSide(config, serviceContainer) {
         Meta: meta.meta.toString(),
         Link: meta.link.toString(),
         Script: meta.script.toString(),
-        Style: styles,
+        Style: emotionCss,
         BodyAttributes: meta.bodyAttributes.toString(),
     };
 }

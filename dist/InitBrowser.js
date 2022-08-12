@@ -22,8 +22,6 @@ export function InitBrowser(config, containerId, serviceContainer) {
 function _doInitBrowser(config, containerId, serviceContainer) {
     EpiContext.init(config, serviceContainer || new DefaultServiceContainer());
     setBaseClassName('MO');
-    const app = (React.createElement(CacheProvider, { value: muiCache !== null && muiCache !== void 0 ? muiCache : createMuiCache() },
-        React.createElement(CmsSite, { context: EpiContext })));
     const container = document.getElementById(containerId ? containerId : 'epi-page-container');
     if (container && container.childElementCount > 0) {
         const components = EpiContext.config().preLoadComponents || [];
@@ -33,13 +31,14 @@ function _doInitBrowser(config, containerId, serviceContainer) {
         ComponentPreLoader.load(components, loader).finally(() => {
             if (EpiContext.isDebugActive())
                 console.info('Hydrating existing render, Stage 2. Hydration ...');
-            ReactDOM.hydrate(app, container);
+            ReactDOM.hydrate(React.createElement(CacheProvider, { value: muiCache !== null && muiCache !== void 0 ? muiCache : createMuiCache() },
+                React.createElement(CmsSite, { context: EpiContext })), container);
         });
     }
     else {
         if (EpiContext.isDebugActive())
             console.info('Building new application');
-        ReactDOM.render(app, container);
+        ReactDOM.render(React.createElement(CmsSite, { context: EpiContext }), container);
     }
 }
 export default InitBrowser;

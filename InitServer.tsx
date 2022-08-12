@@ -46,9 +46,11 @@ export default function RenderServerSide(config: AppConfig, serviceContainer?: I
 
   const muiCache = createMuiCache();
 
-  const emotionServers = [muiCache, getTssDefaultEmotionCache({ doReset: true })].map(createEmotionServer);
+  //const emotionServers = getTssDefaultEmotionCache({ doReset: true });
 
   setBaseClassName('MO');
+
+  const { extractCriticalToChunks, constructStyleTagsFromChunks } = createEmotionServer(muiCache);
 
   const staticContext: StaticRouterContext = {};
 
@@ -58,11 +60,14 @@ export default function RenderServerSide(config: AppConfig, serviceContainer?: I
     </CacheProvider>,
   );
 
-  const styles = emotionServers
-    .map(({ extractCriticalToChunks, constructStyleTagsFromChunks }) =>
-      constructStyleTagsFromChunks(extractCriticalToChunks(body)),
-    )
-    .join('');
+  const emotionChunks = extractCriticalToChunks(body);
+  const emotionCss = constructStyleTagsFromChunks(emotionChunks);
+
+  // const styles = emotionServers
+  //   .map(({ extractCriticalToChunks, constructStyleTagsFromChunks }) =>
+  //     constructStyleTagsFromChunks(extractCriticalToChunks(body)),
+  //   )
+  //   .join('');
 
   const meta = Helmet.renderStatic();
 
@@ -73,7 +78,7 @@ export default function RenderServerSide(config: AppConfig, serviceContainer?: I
     Meta: meta.meta.toString(),
     Link: meta.link.toString(),
     Script: meta.script.toString(),
-    Style: styles,
+    Style: emotionCss,
     BodyAttributes: meta.bodyAttributes.toString(),
   };
 }
