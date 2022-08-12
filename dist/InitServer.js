@@ -8,9 +8,9 @@ import createEmotionServer from '@emotion/server/create-instance';
 import DefaultServiceContainer from './Core/DefaultServiceContainer';
 import EpiSpaContext from './Spa';
 import CmsSite from './Components/CmsSite';
-import { createMuiCache, setBaseClassName } from './Util/StylingUtils';
-import { CacheProvider } from '@emotion/react';
+import { setBaseClassName } from './Util/StylingUtils';
 import { getTssDefaultEmotionCache } from 'tss-react';
+import { createMuiCache } from './InitBrowser';
 export default function RenderServerSide(config, serviceContainer) {
     // Update context
     const ctx = getGlobal();
@@ -25,10 +25,8 @@ export default function RenderServerSide(config, serviceContainer) {
     const muiCache = createMuiCache();
     const emotionServers = [muiCache, getTssDefaultEmotionCache({ doReset: true })].map(createEmotionServer);
     setBaseClassName('MO');
-    //const emotionCache = getTssDefaultEmotionCache({doReset: true})
     const staticContext = {};
-    const body = renderToString(React.createElement(CacheProvider, { value: muiCache },
-        React.createElement(CmsSite, { context: EpiSpaContext, staticContext: staticContext })));
+    const body = renderToString(React.createElement(CmsSite, { context: EpiSpaContext, staticContext: staticContext }));
     const styles = emotionServers
         .map(({ extractCriticalToChunks, constructStyleTagsFromChunks }) => constructStyleTagsFromChunks(extractCriticalToChunks(body)))
         .join('');

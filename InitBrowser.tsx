@@ -8,12 +8,12 @@ import IServiceContainer from './Core/IServiceContainer';
 import DefaultServiceContainer from './Core/DefaultServiceContainer';
 import ServerContextType from './ServerSideRendering/ServerContext';
 
-import { createMuiCache, setBaseClassName } from './Util/StylingUtils';
-import createCache from '@emotion/cache';
+import { setBaseClassName } from './Util/StylingUtils';
+import createCache, { EmotionCache } from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
-import { getTssDefaultEmotionCache } from 'tss-react';
 
 declare let __INITIAL_DATA__: ServerContextType;
+let muiCache: EmotionCache | undefined = undefined;
 
 export function InitBrowser(config: AppConfig, containerId?: string, serviceContainer?: IServiceContainer): void {
   try {
@@ -27,13 +27,20 @@ export function InitBrowser(config: AppConfig, containerId?: string, serviceCont
   return _doInitBrowser(config, containerId, serviceContainer);
 }
 
+export function createMuiCache(): EmotionCache {
+  return (muiCache = createCache({
+    key: 'mo',
+    prepend: true,
+  }));
+}
+
 function _doInitBrowser(config: AppConfig, containerId?: string, serviceContainer?: IServiceContainer): void {
   EpiContext.init(config, serviceContainer || new DefaultServiceContainer());
 
   setBaseClassName('MO');
 
   const app = (
-    <CacheProvider value={createMuiCache()}>
+    <CacheProvider value={muiCache ?? createMuiCache()}>
       <CmsSite context={EpiContext} />
     </CacheProvider>
   );

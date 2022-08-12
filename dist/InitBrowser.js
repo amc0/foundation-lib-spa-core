@@ -4,8 +4,10 @@ import CmsSite from './Components/CmsSite';
 import EpiContext from './Spa';
 import ComponentPreLoader from './Loaders/ComponentPreLoader';
 import DefaultServiceContainer from './Core/DefaultServiceContainer';
-import { createMuiCache, setBaseClassName } from './Util/StylingUtils';
+import { setBaseClassName } from './Util/StylingUtils';
+import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
+let muiCache = undefined;
 export function InitBrowser(config, containerId, serviceContainer) {
     try {
         if ((__INITIAL_DATA__ === null || __INITIAL_DATA__ === void 0 ? void 0 : __INITIAL_DATA__.status) === 'loading') {
@@ -18,10 +20,16 @@ export function InitBrowser(config, containerId, serviceContainer) {
     }
     return _doInitBrowser(config, containerId, serviceContainer);
 }
+export function createMuiCache() {
+    return (muiCache = createCache({
+        key: 'mo',
+        prepend: true,
+    }));
+}
 function _doInitBrowser(config, containerId, serviceContainer) {
     EpiContext.init(config, serviceContainer || new DefaultServiceContainer());
     setBaseClassName('MO');
-    const app = (React.createElement(CacheProvider, { value: createMuiCache() },
+    const app = (React.createElement(CacheProvider, { value: muiCache !== null && muiCache !== void 0 ? muiCache : createMuiCache() },
         React.createElement(CmsSite, { context: EpiContext })));
     const container = document.getElementById(containerId ? containerId : 'epi-page-container');
     if (container && container.childElementCount > 0) {

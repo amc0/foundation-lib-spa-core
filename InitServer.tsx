@@ -18,9 +18,10 @@ import AppConfig from './AppConfig';
 
 // Episerver SPA/PWA Server Side Rendering libs
 import SSRResponse from './ServerSideRendering/Response';
-import { createMuiCache, setBaseClassName } from './Util/StylingUtils';
+import { setBaseClassName } from './Util/StylingUtils';
 import { CacheProvider } from '@emotion/react';
 import { getTssDefaultEmotionCache } from 'tss-react';
+import { createMuiCache } from './InitBrowser';
 
 export default function RenderServerSide(config: AppConfig, serviceContainer?: IServiceContainer): SSRResponse {
   // Update context
@@ -41,14 +42,9 @@ export default function RenderServerSide(config: AppConfig, serviceContainer?: I
 
   setBaseClassName('MO');
 
-  //const emotionCache = getTssDefaultEmotionCache({doReset: true})
   const staticContext: StaticRouterContext = {};
 
-  const body = renderToString(
-    <CacheProvider value={muiCache}>
-      <CmsSite context={EpiSpaContext} staticContext={staticContext} />
-    </CacheProvider>,
-  );
+  const body = renderToString(<CmsSite context={EpiSpaContext} staticContext={staticContext} />);
 
   const styles = emotionServers
     .map(({ extractCriticalToChunks, constructStyleTagsFromChunks }) =>
