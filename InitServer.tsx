@@ -52,7 +52,11 @@ export default function RenderServerSide(config: AppConfig, serviceContainer?: I
 
   const staticContext: StaticRouterContext = {};
 
-  const body = renderToString(<CmsSite context={EpiSpaContext} staticContext={staticContext} />);
+  const body = renderToString(
+    <CacheProvider value={muiCache}>
+      <CmsSite context={EpiSpaContext} staticContext={staticContext} />
+    </CacheProvider>,
+  );
 
   const styles = emotionServers
     .map(({ extractCriticalToChunks, constructStyleTagsFromChunks }) =>
