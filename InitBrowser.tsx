@@ -9,11 +9,10 @@ import DefaultServiceContainer from './Core/DefaultServiceContainer';
 import ServerContextType from './ServerSideRendering/ServerContext';
 
 import { setBaseClassName } from './Util/StylingUtils';
-import createCache, { EmotionCache } from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
+import { createMuiCache, muiCache } from './InitServer';
 
 declare let __INITIAL_DATA__: ServerContextType;
-let muiCache: EmotionCache | undefined = undefined;
 
 export function InitBrowser(config: AppConfig, containerId?: string, serviceContainer?: IServiceContainer): void {
   try {
@@ -25,13 +24,6 @@ export function InitBrowser(config: AppConfig, containerId?: string, serviceCont
     // Ignore on purpose
   }
   return _doInitBrowser(config, containerId, serviceContainer);
-}
-
-export function createMuiCache(): EmotionCache {
-  return (muiCache = createCache({
-    key: 'mo',
-    prepend: true,
-  }));
 }
 
 function _doInitBrowser(config: AppConfig, containerId?: string, serviceContainer?: IServiceContainer): void {

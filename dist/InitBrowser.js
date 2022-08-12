@@ -5,9 +5,8 @@ import EpiContext from './Spa';
 import ComponentPreLoader from './Loaders/ComponentPreLoader';
 import DefaultServiceContainer from './Core/DefaultServiceContainer';
 import { setBaseClassName } from './Util/StylingUtils';
-import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
-let muiCache = undefined;
+import { createMuiCache, muiCache } from './InitServer';
 export function InitBrowser(config, containerId, serviceContainer) {
     try {
         if ((__INITIAL_DATA__ === null || __INITIAL_DATA__ === void 0 ? void 0 : __INITIAL_DATA__.status) === 'loading') {
@@ -19,12 +18,6 @@ export function InitBrowser(config, containerId, serviceContainer) {
         // Ignore on purpose
     }
     return _doInitBrowser(config, containerId, serviceContainer);
-}
-export function createMuiCache() {
-    return (muiCache = createCache({
-        key: 'mo',
-        prepend: true,
-    }));
 }
 function _doInitBrowser(config, containerId, serviceContainer) {
     EpiContext.init(config, serviceContainer || new DefaultServiceContainer());

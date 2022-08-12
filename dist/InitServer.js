@@ -4,13 +4,20 @@ import getGlobal from './AppGlobal';
 import { renderToString } from 'react-dom/server';
 import { Helmet } from 'react-helmet';
 import React from 'react';
+import createCache from '@emotion/cache';
 import createEmotionServer from '@emotion/server/create-instance';
 import DefaultServiceContainer from './Core/DefaultServiceContainer';
 import EpiSpaContext from './Spa';
 import CmsSite from './Components/CmsSite';
 import { setBaseClassName } from './Util/StylingUtils';
 import { getTssDefaultEmotionCache } from 'tss-react';
-import { createMuiCache } from './InitBrowser';
+export let muiCache = undefined;
+export function createMuiCache() {
+    return (muiCache = createCache({
+        key: 'mo',
+        prepend: true,
+    }));
+}
 export default function RenderServerSide(config, serviceContainer) {
     // Update context
     const ctx = getGlobal();

@@ -19,9 +19,17 @@ import AppConfig from './AppConfig';
 // Episerver SPA/PWA Server Side Rendering libs
 import SSRResponse from './ServerSideRendering/Response';
 import { setBaseClassName } from './Util/StylingUtils';
-import { CacheProvider } from '@emotion/react';
+import { CacheProvider, EmotionCache } from '@emotion/react';
 import { getTssDefaultEmotionCache } from 'tss-react';
-import { createMuiCache } from './InitBrowser';
+
+export let muiCache: EmotionCache | undefined = undefined;
+
+export function createMuiCache(): EmotionCache {
+  return (muiCache = createCache({
+    key: 'mo',
+    prepend: true,
+  }));
+}
 
 export default function RenderServerSide(config: AppConfig, serviceContainer?: IServiceContainer): SSRResponse {
   // Update context
