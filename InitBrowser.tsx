@@ -8,7 +8,6 @@ import IServiceContainer from './Core/IServiceContainer';
 import DefaultServiceContainer from './Core/DefaultServiceContainer';
 import ServerContextType from './ServerSideRendering/ServerContext';
 
-import { setBaseClassName } from './Util/StylingUtils';
 import { CacheProvider } from '@emotion/react';
 import { createMuiCache, muiCache } from './InitServer';
 
@@ -28,8 +27,6 @@ export function InitBrowser(config: AppConfig, containerId?: string, serviceCont
 
 function _doInitBrowser(config: AppConfig, containerId?: string, serviceContainer?: IServiceContainer): void {
   EpiContext.init(config, serviceContainer || new DefaultServiceContainer());
-
-  //setBaseClassName('MO');
 
   const container = document.getElementById(containerId ? containerId : 'epi-page-container');
   if (container && container.childElementCount > 0) {

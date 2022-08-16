@@ -9,7 +9,7 @@ import createEmotionServer from '@emotion/server/create-instance';
 import DefaultServiceContainer from './Core/DefaultServiceContainer';
 import EpiSpaContext from './Spa';
 import CmsSite from './Components/CmsSite';
-import { CacheProvider } from '@emotion/react';
+import { getTssDefaultEmotionCache } from 'tss-react';
 export let muiCache = undefined;
 export function createMuiCache() {
     return (muiCache = createCache({
@@ -29,19 +29,12 @@ export default function RenderServerSide(config, serviceContainer) {
     config.enableDebug = true;
     EpiSpaContext.init(config, serviceContainer, true);
     const muiCache = createMuiCache();
-    //const emotionServers = getTssDefaultEmotionCache({ doReset: true });
-    //setBaseClassName('MO');
-    const { extractCriticalToChunks, constructStyleTagsFromChunks } = createEmotionServer(muiCache);
+    const emotionServers = [createMuiCache(), getTssDefaultEmotionCache({ doReset: true })].map(createEmotionServer);
     const staticContext = {};
-    const body = renderToString(React.createElement(CacheProvider, { value: muiCache },
-        React.createElement(CmsSite, { context: EpiSpaContext, staticContext: staticContext })));
-    const emotionChunks = extractCriticalToChunks(body);
-    const emotionCss = constructStyleTagsFromChunks(emotionChunks);
-    // const styles = emotionServers
-    //   .map(({ extractCriticalToChunks, constructStyleTagsFromChunks }) =>
-    //     constructStyleTagsFromChunks(extractCriticalToChunks(body)),
-    //   )
-    //   .join('');
+    const body = renderToString(React.createElement(CmsSite, { context: EpiSpaContext, staticContext: staticContext }));
+    const styles = emotionServers
+        .map(({ extractCriticalToChunks, constructStyleTagsFromChunks }) => constructStyleTagsFromChunks(extractCriticalToChunks(body)))
+        .join('');
     const meta = Helmet.renderStatic();
     return {
         Body: body.toString(),
@@ -50,7 +43,7 @@ export default function RenderServerSide(config, serviceContainer) {
         Meta: meta.meta.toString(),
         Link: meta.link.toString(),
         Script: meta.script.toString(),
-        Style: emotionCss,
+        Style: styles,
         BodyAttributes: meta.bodyAttributes.toString(),
     };
 }

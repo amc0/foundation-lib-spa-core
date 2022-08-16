@@ -20,7 +20,6 @@ export function InitBrowser(config, containerId, serviceContainer) {
 }
 function _doInitBrowser(config, containerId, serviceContainer) {
     EpiContext.init(config, serviceContainer || new DefaultServiceContainer());
-    //setBaseClassName('MO');
     const container = document.getElementById(containerId ? containerId : 'epi-page-container');
     if (container && container.childElementCount > 0) {
         const components = EpiContext.config().preLoadComponents || [];
