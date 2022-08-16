@@ -4,7 +4,6 @@ import CmsSite from './Components/CmsSite';
 import EpiContext from './Spa';
 import ComponentPreLoader from './Loaders/ComponentPreLoader';
 import DefaultServiceContainer from './Core/DefaultServiceContainer';
-import { setBaseClassName } from './Util/StylingUtils';
 import { CacheProvider } from '@emotion/react';
 import { createMuiCache, muiCache } from './InitServer';
 export function InitBrowser(config, containerId, serviceContainer) {
@@ -21,7 +20,7 @@ export function InitBrowser(config, containerId, serviceContainer) {
 }
 function _doInitBrowser(config, containerId, serviceContainer) {
     EpiContext.init(config, serviceContainer || new DefaultServiceContainer());
-    setBaseClassName('MO');
+    //setBaseClassName('MO');
     const container = document.getElementById(containerId ? containerId : 'epi-page-container');
     if (container && container.childElementCount > 0) {
         const components = EpiContext.config().preLoadComponents || [];

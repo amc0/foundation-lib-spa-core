@@ -9,7 +9,6 @@ import createEmotionServer from '@emotion/server/create-instance';
 import DefaultServiceContainer from './Core/DefaultServiceContainer';
 import EpiSpaContext from './Spa';
 import CmsSite from './Components/CmsSite';
-import { setBaseClassName } from './Util/StylingUtils';
 import { CacheProvider } from '@emotion/react';
 export let muiCache = undefined;
 export function createMuiCache() {
@@ -31,7 +30,7 @@ export default function RenderServerSide(config, serviceContainer) {
     EpiSpaContext.init(config, serviceContainer, true);
     const muiCache = createMuiCache();
     //const emotionServers = getTssDefaultEmotionCache({ doReset: true });
-    setBaseClassName('MO');
+    //setBaseClassName('MO');
     const { extractCriticalToChunks, constructStyleTagsFromChunks } = createEmotionServer(muiCache);
     const staticContext = {};
     const body = renderToString(React.createElement(CacheProvider, { value: muiCache },

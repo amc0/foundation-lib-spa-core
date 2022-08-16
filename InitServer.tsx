@@ -48,7 +48,7 @@ export default function RenderServerSide(config: AppConfig, serviceContainer?: I
 
   //const emotionServers = getTssDefaultEmotionCache({ doReset: true });
 
-  setBaseClassName('MO');
+  //setBaseClassName('MO');
 
   const { extractCriticalToChunks, constructStyleTagsFromChunks } = createEmotionServer(muiCache);
 
