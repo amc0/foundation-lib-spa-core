@@ -12,7 +12,7 @@ import CmsState from '../State/CmsState';
  *
  * @constant { React.Context<IEpiserverContext | undefined> } Episerver
  */
-export declare const Episerver: React.Context<IEpiserverContext | undefined>;
+export declare const Episerver: React.Context<IEpiserverContext>;
 export default Episerver;
 /**
  * React Hook (for functional components) to retrieve the Episerver Context from
