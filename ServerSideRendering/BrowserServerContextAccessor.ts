@@ -29,10 +29,11 @@ export class BrowserServerContextAccessor implements IServerContextAccessor {
   constructor(execContext: Readonly<IExecutionContext>, config: Readonly<IAppConfig>) {
     this._context = execContext;
     this._config = config;
-    //const decryptedData = JSON.parse(atob(__INITIAL_ENCRYPTED_DATA__));
-    const buffer = Buffer.from(__INITIAL_ENCRYPTED_DATA__, 'base64');
-    const decryptedData = JSON.parse(buffer.toString());
-    __INITIAL__DATA__ = Object.assign({}, decryptedData);
+    if (__INITIAL_ENCRYPTED_DATA__) {
+      const decryptedData = decodeURIComponent(escape(window.atob(__INITIAL_ENCRYPTED_DATA__)));
+      const data = JSON.parse(decryptedData);
+      __INITIAL__DATA__ = Object.assign({}, data);
+    }
   }
 
   public get IsAvailable(): boolean {
