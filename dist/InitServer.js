@@ -7,8 +7,15 @@ import React from 'react';
 import DefaultServiceContainer from './Core/DefaultServiceContainer';
 import EpiSpaContext from './Spa';
 import CmsSite from './Components/CmsSite';
-import { ServerStyleSheets, createGenerateClassName } from "@material-ui/core/styles";
+import createCache from '@emotion/cache';
+export function createMyCache() {
+    return createCache({ key: 'mo', prepend: true });
+}
+import createEmotionServer from '@emotion/server/create-instance';
+import { CacheProvider } from '@emotion/react';
 export default function RenderServerSide(config, serviceContainer) {
+    const cache = createMyCache();
+    const { extractCriticalToChunks, constructStyleTagsFromChunks } = createEmotionServer(cache);
     // Update context
     const ctx = getGlobal();
     ctx.epi = ctx.epi || {};
@@ -19,16 +26,13 @@ export default function RenderServerSide(config, serviceContainer) {
     config.noAjax = true;
     config.enableDebug = true;
     EpiSpaContext.init(config, serviceContainer, true);
-    const classPrefix = "MO";
-    const generateClassName = () => createGenerateClassName({
-        productionPrefix: classPrefix
-    });
     const staticContext = {};
-    const sheets = new ServerStyleSheets({
-        serverGenerateClassName: generateClassName()
-    });
-    const body = ReactDOMServer.renderToString(sheets.collect(React.createElement(CmsSite, { context: EpiSpaContext, staticContext: staticContext })));
+    const body = ReactDOMServer.renderToString(React.createElement(CacheProvider, { value: cache },
+        React.createElement(CmsSite, { context: EpiSpaContext, staticContext: staticContext }),
+        ","));
     const meta = Helmet.renderStatic();
+    const emotionChunks = extractCriticalToChunks(body);
+    const emotionCss = constructStyleTagsFromChunks(emotionChunks);
     return {
         Body: body,
         HtmlAttributes: meta.htmlAttributes.toString(),
@@ -36,8 +40,8 @@ export default function RenderServerSide(config, serviceContainer) {
         Meta: meta.meta.toString(),
         Link: meta.link.toString(),
         Script: meta.script.toString(),
-        Style: sheets.toString(),
-        BodyAttributes: meta.bodyAttributes.toString()
+        Style: emotionCss,
+        BodyAttributes: meta.bodyAttributes.toString(),
     };
 }
 //# sourceMappingURL=InitServer.js.map

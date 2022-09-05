@@ -16,12 +16,12 @@ import AppConfig from './AppConfig';
 import createCache from '@emotion/cache';
 
 export function createMyCache() {
-  return createCache({ key: 'css' });
+  return createCache({ key: 'mo', prepend: true });
 }
 
 // Episerver SPA/PWA Server Side Rendering libs
 import SSRResponse from './ServerSideRendering/Response';
-import createEmotionServer from '@emotion/server/types/create-instance';
+import createEmotionServer from '@emotion/server/create-instance';
 import { CacheProvider } from '@emotion/react';
 
 export default function RenderServerSide(config: AppConfig, serviceContainer?: IServiceContainer): SSRResponse {
@@ -39,7 +39,6 @@ export default function RenderServerSide(config: AppConfig, serviceContainer?: I
   config.noAjax = true;
   config.enableDebug = true;
   EpiSpaContext.init(config, serviceContainer, true);
-  const classPrefix = 'MO';
 
   const staticContext: StaticRouterContext = {};
 
